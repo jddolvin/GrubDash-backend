@@ -5,7 +5,7 @@
 Download the zip file (or clone the repository), and extract to a folder of your choice.
 Enter the folder where you stored the application files and run the following command: `npm install`
 
-After everything has been installed you can run: `npm start`.
+After everything has been installed you can run: `npm start`,
 and the application will automatically spin up a server on your local machine (Port 5000).
 
 ### Downloading the frontend
