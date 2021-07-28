@@ -1,12 +1,12 @@
-const path = require('path');
-const orders = require(path.resolve('src/data/orders-data'));
-const nextId = require('../utils/nextId');
+const path = require("path");
+const orders = require(path.resolve("src/data/orders-data"));
+const nextId = require("../utils/nextId");
 
-const list = (req, res) => {
+const list = (req, res, next) => {
   res.json({ data: orders });
 };
 
-const create = (req, res) => {
+const create = (req, res, next) => {
   const id = nextId();
   const newOrder = { ...res.locals.validOrder.data, id };
   orders.push(newOrder);
@@ -17,7 +17,7 @@ const isValid = (req, res, next) => {
   const {
     data: { dishes },
   } = req.body;
-  const requiredFields = ['deliverTo', 'mobileNumber', 'dishes'];
+  const requiredFields = ["deliverTo", "mobileNumber", "dishes"];
   for (const field of requiredFields) {
     if (!req.body.data[field]) {
       return next({ status: 400, message: `Order must include a ${field}` });
@@ -26,7 +26,7 @@ const isValid = (req, res, next) => {
   if (dishes.length === 0 || !Array.isArray(dishes))
     return next({
       status: 400,
-      message: 'Order must include at least one dish',
+      message: "Order must include at least one dish",
     });
   res.locals.validOrder = req.body;
   next();
@@ -38,7 +38,7 @@ const checkDishes = (req, res, next) => {
     if (
       !dish.quantity ||
       dish.quantity <= 0 ||
-      typeof dish.quantity !== 'number'
+      typeof dish.quantity !== "number"
     ) {
       return next({
         status: 400,
@@ -49,7 +49,7 @@ const checkDishes = (req, res, next) => {
   next();
 };
 
-const read = (req, res) => {
+const read = (req, res, next) => {
   res.json({ data: res.locals.order });
 };
 
@@ -64,20 +64,20 @@ const isFound = (req, res, next) => {
   next();
 };
 
-const checkStatus = (req, next) => {
+const checkStatus = (req, res, next) => {
   const {
     data: { status },
   } = req.body;
-  if (!status || status === 'invalid')
+  if (!status || status === "invalid")
     return next({
       status: 400,
       message:
-        'Order must have a status of pending, preparing, out-for-delivery, delivered',
+        "Order must have a status of pending, preparing, out-for-delivery, delivered",
     });
-  if (status === 'delivered')
+  if (status === "delivered")
     return next({
       status: 400,
-      message: 'A delivered order cannot be changed',
+      message: "A delivered order cannot be changed",
     });
   next();
 };
@@ -93,17 +93,18 @@ const update = (req, res, next) => {
   res.json({ data: orders[index] });
 };
 
-const destroy = (res, next) => {
-  let index = orders.indexOf(res.locals.order);
-  if (orders[index].status === 'pending') {
-    orders.filter((order, ind) => ind !== index);
-    res.sendStatus(204);
-  } else {
-    next({
+function destroy(req, res, next) {
+  const foundOrder = res.locals.order;
+  if (foundOrder.status !== "pending") {
+    return next({
       status: 400,
-      message: 'An order cannot be deleted unless it is pending',
+      message: `order must be pending to cancel`,
     });
   }
+  const { orderId } = req.params;
+  const index = orders.findIndex((order) => orderId === order.id);
+  orders.splice(index, 1);
+  res.sendStatus(204);
 };
 
 module.exports = {
