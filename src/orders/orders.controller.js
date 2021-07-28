@@ -2,18 +2,18 @@ const path = require("path");
 const orders = require(path.resolve("src/data/orders-data"));
 const nextId = require("../utils/nextId");
 
-const list = (req, res, next) => {
+const list = (req, res) => {
   res.json({ data: orders });
 };
 
-const create = (req, res, next) => {
+const create = (req, res) => {
   const id = nextId();
   const newOrder = { ...res.locals.validOrder.data, id };
   orders.push(newOrder);
   res.status(201).json({ data: newOrder });
 };
 
-const isValid = (req, res, next) => {
+const isValid = (req, res) => {
   const {
     data: { dishes },
   } = req.body;
@@ -49,7 +49,7 @@ const checkDishes = (req, res, next) => {
   next();
 };
 
-const read = (req, res, next) => {
+const read = (req, res) => {
   res.json({ data: res.locals.order });
 };
 

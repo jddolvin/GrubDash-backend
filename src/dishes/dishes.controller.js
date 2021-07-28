@@ -1,12 +1,12 @@
-const path = require('path');
-const dishes = require(path.resolve('src/data/dishes-data'));
-const nextId = require('../utils/nextId');
+const path = require("path");
+const dishes = require(path.resolve("src/data/dishes-data"));
+const nextId = require("../utils/nextId");
 
-function list(req, res, next) {
+function list(req, res) {
   res.json({ data: dishes });
 }
 
-function dishExists(req, res, next) {
+function dishExists(req, res) {
   const dishId = req.params.dishId;
   const foundDish = dishes.find((dish) => dish.id === dishId);
   if (foundDish) {
@@ -19,14 +19,14 @@ function dishExists(req, res, next) {
   });
 }
 
-function read(req, res, next) {
+function read(req, res) {
   res.json({ data: res.locals.dish });
 }
 
 function checkDishId(req, res, next) {
   const dishId = req.params.dishId;
   const id = req.body.data.id;
-  if (dishId !== id && id !== undefined && (id !== '') & (id !== null)) {
+  if (dishId !== id && id !== undefined && (id !== "") & (id !== null)) {
     return next({
       status: 400,
       message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`,
@@ -35,7 +35,7 @@ function checkDishId(req, res, next) {
   return next();
 }
 
-function update(req, res, next) {
+function update(req, res) {
   const dishId = req.params.dishId;
   const foundDish = dishes.find((dish) => dish.id === dishId);
   const { data: { name, description, price, image_url } = {} } = req.body;
@@ -49,59 +49,39 @@ function update(req, res, next) {
 }
 
 function isValidDish(req, res, next) {
-  const {
-    data: { name, description, price, image_url },
-  } = req.body;
-  if (!name)
+  const { data } = req.body;
+  if (!data) {
     return next({
       status: 400,
-      message: `Dish must include a name`,
+      message: "Please include a request body with the dish's attributes.",
     });
-  if (name === '')
+  }
+  if (!data.name || data.name.trim().length === 0) {
+    return next({ status: 400, message: "Dish must include a name" });
+  }
+  if (!data.description || data.description.trim().length === 0) {
+    return next({ status: 400, message: "Dish must include a description" });
+  }
+  if (!data.price) {
+    return next({ status: 400, message: "Dish must include a price" });
+  }
+  if (
+    typeof data.price !== "number" ||
+    data.price - Math.floor(data.price) !== 0 ||
+    data.price <= 0
+  ) {
     return next({
       status: 400,
-      message: `Dish must include a name`,
+      message: "Dish must have a price that is an integer greater than 0",
     });
-  if (!description)
-    return next({
-      status: 400,
-      message: `Dish must include a description`,
-    });
-  if (description === '')
-    return next({
-      status: 400,
-      message: `Dish must include a description`,
-    });
-  if (!price)
-    return next({
-      status: 400,
-      message: `Dish must include a price`,
-    });
-  if (price <= 0)
-    return next({
-      status: 400,
-      message: `Dish must have a price that is an integer greater than 0`,
-    });
-  if (typeof price !== 'number')
-    return next({
-      status: 400,
-      message: `Dish must have a price that is an integer greater than 0`,
-    });
-  if (!image_url)
-    return next({
-      status: 400,
-      message: `Dish must include a image_url`,
-    });
-  if (image_url === '')
-    return next({
-      status: 400,
-      message: `Dish must include a image_url`,
-    });
-  res.locals.dish = { data: { name, description, price, image_url } };
+  }
+  if (!data.image_url || data.image_url.trim().length === 0) {
+    return next({ status: 400, message: "Dish must include a image_url" });
+  }
   return next();
 }
 
-function create(req, res, next) {
+function create(req, res) {
   let { data: { name, description, price, image_url } = {} } = req.body;
 
   const newDish = {
