@@ -13,7 +13,7 @@ const create = (req, res) => {
   res.status(201).json({ data: newOrder });
 };
 
-const isValid = (req, res) => {
+const isValid = (req, res, next) => {
   const {
     data: { dishes },
   } = req.body;

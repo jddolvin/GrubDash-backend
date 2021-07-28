@@ -6,7 +6,7 @@ function list(req, res) {
   res.json({ data: dishes });
 }
 
-function dishExists(req, res) {
+function dishExists(req, res, next) {
   const dishId = req.params.dishId;
   const foundDish = dishes.find((dish) => dish.id === dishId);
   if (foundDish) {
