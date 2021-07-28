@@ -1,4 +1,4 @@
-function errorHandler(error, request, response, next) {
+function errorHandler(error, response) {
   // console.error(error);  // Commented out to silence tests.
   const { status = 500, message = "Something went wrong!" } = error;
   response.status(status).json({ error: message });
