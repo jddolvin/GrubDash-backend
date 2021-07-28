@@ -1,7 +1,7 @@
 const path = require("path");
 const orders = require(path.resolve("src/data/orders-data"));
 const nextId = require("../utils/nextId");
-
+// This file declares the routes and validations used by the program
 const list = (req, res) => {
   res.json({ data: orders });
 };

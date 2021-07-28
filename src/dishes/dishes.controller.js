@@ -1,7 +1,7 @@
 const path = require("path");
 const dishes = require(path.resolve("src/data/dishes-data"));
 const nextId = require("../utils/nextId");
-
+// This file declares the routes and validations used by the program
 function list(req, res) {
   res.json({ data: dishes });
 }
